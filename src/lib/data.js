@@ -16,7 +16,7 @@ export const CONNECTION_GAMES = [
       difficulty: 3, // Blue category
     },
     {
-      category: "__CUKOR",
+      category: "__CUKOR(-ru)",
       words: ["pridaný", "hnedý", "rafinovaný", "hroznový"],
       difficulty: 4, // Purple category
     },
