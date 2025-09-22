@@ -3,7 +3,7 @@ import { shuffleGameData } from "../../lib/game-helpers";
 import GameGrid from "../GameGrid";
 import NumberOfMistakesDisplay from "../NumberOfMistakesDisplay";
 import GameLostModal from "../modals/GameLostModal";
-import GameWonModal from "../modals/GameWonModal";
+import BenevolentModal from "../modals/BenevolentModal";
 
 import { Separator } from "../ui/separator";
 import ConfettiExplosion from "react-confetti-explosion";
@@ -12,12 +12,11 @@ import { PuzzleDataContext } from "../../providers/PuzzleDataProvider";
 import { GameStatusContext } from "../../providers/GameStatusProvider";
 import GameControlButtonsPanel from "../GameControlButtonsPanel";
 
-import ViewResultsModal from "../modals/ViewResultsModal";
 
 function Game() {
   const { gameData, categorySize, numCategories } =
     React.useContext(PuzzleDataContext);
-  const { submittedGuesses, solvedGameData, isGameOver, isGameWon } =
+  const { submittedGuesses, solvedGameData, isGameOver, isGameWon, showBenevolentModal, resetGame } =
     React.useContext(GameStatusContext);
 
   const [shuffledRows, setShuffledRows] = React.useState(
@@ -39,6 +38,13 @@ function Game() {
       setShuffledRows(shuffleGameData({ gameData: dataLeftForRows }));
     }
   }, [solvedGameData]);
+
+  // use effect to reset shuffled rows when game is reset
+  React.useEffect(() => {
+    if (solvedGameData.length === 0 && submittedGuesses.length === 0) {
+      setShuffledRows(shuffleGameData({ gameData }));
+    }
+  }, [solvedGameData, submittedGuesses, gameData]);
 
   // Handle End Game!
   React.useEffect(() => {
@@ -62,17 +68,23 @@ function Game() {
 
   return (
     <>
-      <h3 className="text-xl text-center mt-4">
-        Create {numCategories} groups of {categorySize}
-      </h3>
+      <div className="text-center mt-4 mb-6">
+        <div className="text-lg font-medium text-gray-700 mb-4 leading-relaxed">
+          Keď hádanku už vyriešiš,<br />
+          čo si dáš presne zistíš,<br />
+          zdvihni oči zo stránky,<br />
+          a spýtaj sa servírky.
+        </div>
+      </div>
 
       <div className={`game-wrapper`}>
-        {isGameOver && isGameWon ? (
-          <GameWonModal
-            open={isEndGameModalOpen}
-            submittedGuesses={submittedGuesses}
+        {showBenevolentModal && (
+          <BenevolentModal
+            open={showBenevolentModal}
+            onResetGame={resetGame}
           />
-        ) : (
+        )}
+        {isGameOver && !isGameWon && (
           <GameLostModal
             open={isEndGameModalOpen}
             submittedGuesses={submittedGuesses}
@@ -94,7 +106,7 @@ function Game() {
         )}
         <Separator />
 
-        {!isGameOver ? (
+        {!isGameOver && (
           <>
             <NumberOfMistakesDisplay />
             <GameControlButtonsPanel
@@ -103,8 +115,6 @@ function Game() {
               setGridShake={setGridShake}
             />
           </>
-        ) : (
-          <ViewResultsModal />
         )}
       </div>
     </>

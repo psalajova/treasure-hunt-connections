@@ -6,7 +6,7 @@ html {
   overflow-y: scroll;
 
   --game-spacing: 32px;
-  --header-height: 4rem;
+  --header-height: 6rem;
 
   --color-success: hsl(150deg 70% 30%);
   --color-warning: hsl(50deg 100% 30%);
@@ -40,7 +40,6 @@ body {
 header {
   display: flex;
   height: var(--header-height);
-  border-bottom: 1px solid var(--color-gray-700);
   color: var(--color-gray-300);
 }
 
@@ -96,6 +95,7 @@ h1 {
   background: var(--color-success);
   color: white;
 }
+
 .sad.banner {
   background: var(--color-error);
   color: white;
@@ -119,6 +119,7 @@ h1 {
   from {
     transform: translateY(100%);
   }
+
   to {
     transform: translateY(0%);
   }

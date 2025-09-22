@@ -13,7 +13,7 @@ import { Badge } from "../ui/badge";
 
 function WordRow({ words }) {
   return (
-    <div className={`grid grid-cols-4 gap-4`}>
+    <div className={`grid grid-cols-4 gap-3`}>
       {words.map((word) => (
         <WordButton key={word} word={word} fullCandidateSize={words.length} />
       ))}
@@ -23,10 +23,10 @@ function WordRow({ words }) {
 
 export function SolvedWordRow({ ...props }) {
   const DIFFICULTY_COLOR_MAP = {
-    1: "rgb(74 222 128)", // green
-    2: "rgb(251 191 36)", // amber
-    3: "rgb(129 140 248)", //indigo
-    4: "rgb(34 211 238)", //cyan
+    1: "#ffeb3b", // yellow - ČAROVNÝ
+    2: "#6acb66", // green - ČAJ
+    3: "#53aefb", // blue - BEZ__
+    4: "#a45cb9", // purple - __CUKOR(-ru)
   };
 
   const color = `${DIFFICULTY_COLOR_MAP[props.difficulty]}`;
@@ -36,29 +36,29 @@ export function SolvedWordRow({ ...props }) {
   const springProps = useSpring({
     from: {
       opacity: 0,
-      transform: "translateY(100%)",
+      transform: "translateY(100%) scale(0.8)",
     },
     to: {
       opacity: 1,
-      transform: "translateY(0%)",
+      transform: "translateY(0%) scale(1.1)",
     },
     delay: 250,
   });
   // if there is an image available render it as a popover
   const isImageAvailable = props.imageSrc != null;
   return (
-    <animated.div style={springProps}>
+    <animated.div style={springProps} className="mb-2">
       {!isImageAvailable ? (
-        <div style={{ backgroundColor: color, borderRadius: 8 }}>
-          <p className="font-bold pt-2 pl-4">{props.category}</p>
-          <p className="font-thin pb-2 pl-4">{props.words.join(", ")}</p>
+        <div style={{ backgroundColor: color, borderRadius: 12 }} className="py-4 px-6">
+          <p className="font-bold text-xl mb-1">{props.category}</p>
+          <p className="font-medium text-lg">{props.words.join(", ")}</p>
         </div>
       ) : (
         <Popover>
           <PopoverTrigger asChild>
             <div
-              className="cursor-pointer hover:animate-pulse shadow-md"
-              style={{ backgroundColor: color, borderRadius: 8 }}
+              className="cursor-pointer hover:animate-pulse shadow-md py-4 px-6"
+              style={{ backgroundColor: color, borderRadius: 12 }}
               onClick={() => setHasBeenClicked(true)}
             >
               {!hasBeenClicked && (
@@ -66,8 +66,8 @@ export function SolvedWordRow({ ...props }) {
                   View More
                 </Badge>
               )}
-              <p className="font-bold pt-2 pl-4">{props.category}</p>
-              <p className="font-thin pb-2 pl-4">{props.words.join(", ")}</p>
+              <p className="font-bold text-xl mb-1">{props.category}</p>
+              <p className="font-medium text-lg">{props.words.join(", ")}</p>
             </div>
           </PopoverTrigger>
           <PopoverContent>
@@ -103,17 +103,21 @@ function GameGrid({ gameRows, shouldGridShake, setShouldGridShake }) {
   const isGameActiveWithAnySolvedRows =
     isGameActive && solvedGameData.length > 0;
 
+  // Sort solved categories by difficulty to ensure correct order (yellow->green->blue->purple)
+  const sortedSolvedData = [...solvedGameData].sort((a, b) => a.difficulty - b.difficulty);
+  const sortedGameData = [...gameData].sort((a, b) => a.difficulty - b.difficulty);
+
   return (
     <div>
       {(isGameOverAndWon || isGameActiveWithAnySolvedRows) && (
-        <div className="grid gap-y-2 pb-2">
-          {solvedGameData.map((solvedRowObj) => (
+        <div className="grid gap-y-3 pb-4">
+          {sortedSolvedData.map((solvedRowObj) => (
             <SolvedWordRow key={solvedRowObj.category} {...solvedRowObj} />
           ))}
         </div>
       )}
       {isGameActive && (
-        <div className={`grid gap-y-2 ${shouldGridShake ? styles.shake : ""}`}>
+        <div className={`grid gap-y-3 ${shouldGridShake ? styles.shake : ""}`}>
           {gameRows.map((row, idx) => (
             <WordRow key={idx} words={row} />
           ))}
@@ -121,9 +125,9 @@ function GameGrid({ gameRows, shouldGridShake, setShouldGridShake }) {
       )}
       {/* Show correct answers here after the game is over if they lost */}
       {isGameOverAndLost && (
-        <div className="grid gap-y-2 pb-2">
-          <p>The answer categories are below.</p>
-          {gameData.map((obj) => (
+        <div className="grid gap-y-3 pb-4">
+          <p className="text-lg font-medium mb-4">The answer categories are below.</p>
+          {sortedGameData.map((obj) => (
             <SolvedWordRow key={obj.category} {...obj} />
           ))}
         </div>

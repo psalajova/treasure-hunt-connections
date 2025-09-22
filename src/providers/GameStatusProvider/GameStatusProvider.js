@@ -13,38 +13,23 @@ export const GameStatusContext = React.createContext();
 
 function GameStatusProvider({ children }) {
   const { gameData } = React.useContext(PuzzleDataContext);
+
+  // Clear any existing local storage on app load for fresh treasure hunt experience
+  React.useEffect(() => {
+    localStorage.removeItem('gameState');
+  }, []);
+
   const [submittedGuesses, setSubmittedGuesses] = React.useState([]);
   const [solvedGameData, setSolvedGameData] = React.useState(() => {
-    const loadedState = loadGameStateFromLocalStorage();
-    console.log("checking game state!", {
-      loadedState: loadedState,
-      gd1: gameData,
-      gd2: loadedState?.gameData,
-    });
-    if (!isGameDataEquivalent({ gd1: gameData, gd2: loadedState?.gameData })) {
-      return [];
-    }
-    if (
-      !isGuessesFromGame({
-        gameData,
-        submittedGuesses: loadedState?.submittedGuesses,
-      })
-    ) {
-      return [];
-    }
-    if (Array.isArray(loadedState?.submittedGuesses)) {
-      setSubmittedGuesses(loadedState.submittedGuesses);
-    }
-
-    if (Array.isArray(loadedState?.solvedGameData)) {
-      return loadedState.solvedGameData;
-    }
+    // For the treasure hunt, always start fresh - don't load from local storage
+    // This ensures the puzzle always starts unsolved
     return [];
   });
 
   const [isGameOver, setIsGameOver] = React.useState(false);
   const [isGameWon, setIsGameWon] = React.useState(false);
   const [guessCandidate, setGuessCandidate] = React.useState([]);
+  const [showBenevolentModal, setShowBenevolentModal] = React.useState(false);
 
   const numMistakesUsed = submittedGuesses.length - solvedGameData.length;
 
@@ -54,19 +39,26 @@ function GameStatusProvider({ children }) {
       setIsGameOver(true);
       setIsGameWon(true);
     }
-    const gameState = { submittedGuesses, solvedGameData, gameData };
-    saveGameStateToLocalStorage(gameState);
+    // Don't save to local storage for treasure hunt - always start fresh
   }, [solvedGameData]);
 
-  // use effect to check if all mistakes have been used and end the game accordingly
+  // use effect to check if all mistakes have been used and show benevolent modal
   React.useEffect(() => {
-    if (numMistakesUsed >= MAX_MISTAKES) {
-      setIsGameOver(true);
-      setIsGameWon(false);
+    if (numMistakesUsed >= MAX_MISTAKES && !isGameWon) {
+      setShowBenevolentModal(true);
     }
-    const gameState = { submittedGuesses, solvedGameData, gameData };
-    saveGameStateToLocalStorage(gameState);
+    // Don't save to local storage for treasure hunt - always start fresh
   }, [submittedGuesses]);
+
+  const resetGame = () => {
+    setSubmittedGuesses([]);
+    setSolvedGameData([]);
+    setIsGameOver(false);
+    setIsGameWon(false);
+    setShowBenevolentModal(false);
+    setGuessCandidate([]);
+    // No local storage for treasure hunt - just reset state
+  };
 
   return (
     <GameStatusContext.Provider
@@ -80,6 +72,9 @@ function GameStatusProvider({ children }) {
         setSubmittedGuesses,
         guessCandidate,
         setGuessCandidate,
+        showBenevolentModal,
+        setShowBenevolentModal,
+        resetGame,
       }}
     >
       {children}

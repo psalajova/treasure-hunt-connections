@@ -3,13 +3,12 @@
 }
 
 .growShrink {
-  /*Tell this element which properties to animate if something changes
-  We are saying all properties will animate when changed seconds*/
-  transition: all 0.4s;
+  /* Fast, snappy transition only for background */
+  transition: background-color 0.15s ease;
 }
 
 .growShrink[data-state="on"] {
-  transform: scale(1.05);
+  /* No transform scaling - just keep it simple */
 }
 
 /* .button {

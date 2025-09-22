@@ -47,8 +47,6 @@ function GameControlButtonsPanel({
 
       return;
     }
-    // add guess to state
-    setSubmittedGuesses([...submittedGuesses, guessCandidate]);
     // check if the guess is correct
     const {
       isCorrect,
@@ -76,14 +74,32 @@ function GameControlButtonsPanel({
       ]);
       setGuessCandidate([]);
     } else {
+      // Only add to submitted guesses if it's not a repeated "one away" guess
+      const lastGuess = submittedGuesses[submittedGuesses.length - 1];
+      const isSameAsLastGuess = lastGuess &&
+        lastGuess.length === guessCandidate.length &&
+        lastGuess.every(word => guessCandidate.includes(word));
+
+      // Check if last guess was also "one away" with same words
+      let wasLastGuessOneAway = false;
+      if (lastGuess) {
+        const lastGuessResult = isGuessCorrect({ guessCandidate: lastGuess, gameData });
+        wasLastGuessOneAway = lastGuessResult.isGuessOneAway;
+      }
+
+      // Only count as new mistake if it's not the same "one away" guess as before
+      if (!isSameAsLastGuess || !isGuessOneAway || !wasLastGuessOneAway) {
+        setSubmittedGuesses([...submittedGuesses, guessCandidate]);
+      }
+
       // Shake the grid to give feedback that they were wrong
       setGridShake(true);
       if (isGuessOneAway) {
         toast({
           label: "Notification",
-          title: "Close Guess",
+          title: "One Off",
           description:
-            "You were one guess away from correctly guessing a category!",
+            "You were one word away from correctly guessing a category!",
         });
       }
     }

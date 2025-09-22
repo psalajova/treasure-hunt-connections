@@ -1,29 +1,34 @@
 import React from "react";
 import BaseModal from "../BaseModal";
-
-import { generateEmojiGrid } from "../../../lib/game-helpers";
-import ShareScoreButton from "../../ShareScoreButton";
-import CountdownToNextPuzzle from "../../CountdownToNextPuzzle";
 import { PuzzleDataContext } from "../../../providers/PuzzleDataProvider";
 
 function GameWonModal({ open, submittedGuesses }) {
   const { gameData } = React.useContext(PuzzleDataContext);
 
+  // Sort categories by difficulty to ensure correct order (yellow->green->blue->purple)
+  const sortedCategories = [...gameData].sort((a, b) => a.difficulty - b.difficulty);
+
   return (
     <BaseModal
-      title="You won the game!"
+      title="Hádanka vyriešená!"
       initiallyOpen={open}
-      footerElements={<ShareScoreButton />}
       showActionButton={false}
     >
-      <p>{"Great job, share your results!"}</p>
-      <div className="justify-center">
-        {/* the whitespace: pre style makes the emoji grid appear with new lines character */}
-        <span className="text-center whitespace-pre">
-          {"\n"}
-          {generateEmojiGrid(gameData, submittedGuesses)}
-        </span>
-        <CountdownToNextPuzzle />
+      <div className="text-center">
+        <div className="text-lg font-medium text-gray-700 mb-6 leading-relaxed">
+          Keď hádanku už vyriešiš,<br />
+          čo si dáš presne zistíš,<br />
+          zdvihni oči zo stránky,<br />
+          a spýtaj sa servírky.
+        </div>
+
+        <div className="space-y-3">
+          {sortedCategories.map((category, index) => (
+            <div key={category.category} className="text-lg font-bold">
+              {index + 1}. {category.category}
+            </div>
+          ))}
+        </div>
       </div>
     </BaseModal>
   );
