@@ -19,7 +19,7 @@ function GameWonModal({ open, submittedGuesses }) {
           Keď hádanku už vyriešiš,<br />
           čo si dáš presne zistíš,<br />
           zdvihni oči zo stránky,<br />
-          a spýtaj sa servírky.
+          a objednaj si u servírky.
         </div>
 
         <div className="space-y-3">
