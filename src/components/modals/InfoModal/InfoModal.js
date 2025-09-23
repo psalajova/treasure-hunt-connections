@@ -12,7 +12,7 @@ function InfoModal() {
     >
       <div className="text-center">
         <p className="text-lg">
-          You will get no hints here ;) Also this was all made with AI so sorry if there are any bugs :D.
+          You will get no hints here 😉 (Also this was all made with AI so sorry if there are any bugs).
         </p>
       </div>
     </BaseModal>

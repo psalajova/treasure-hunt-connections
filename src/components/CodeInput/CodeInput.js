@@ -11,6 +11,11 @@ function CodeInput({ onCorrectCode }) {
         // Only allow digits
         if (!/^\d*$/.test(value)) return;
 
+        // Clear error message when user starts typing again
+        if (errorMessage) {
+            setErrorMessage("");
+        }
+
         const newCode = [...code];
         newCode[index] = value.slice(-1); // Only take the last digit if multiple are entered
         setCode(newCode);
@@ -24,19 +29,21 @@ function CodeInput({ onCorrectCode }) {
         if (newCode.every(digit => digit !== "") && newCode.join("") === "1442") {
             onCorrectCode();
         } else if (newCode.every(digit => digit !== "") && newCode.join("") !== "1442") {
-            // Wrong code - shake and show error
+            // Wrong code - shake and show error, but don't clear the code
             setIsShaking(true);
             setErrorMessage("Wrong code, try again");
             setTimeout(() => {
                 setIsShaking(false);
-                setCode(["", "", "", ""]);
-                setErrorMessage("");
-                inputRefs.current[0]?.focus();
             }, 1000);
         }
     };
 
     const handleKeyDown = (index, e) => {
+        // Clear error message when user starts deleting
+        if (e.key === "Backspace" && errorMessage) {
+            setErrorMessage("");
+        }
+
         if (e.key === "Backspace" && !code[index] && index > 0) {
             inputRefs.current[index - 1]?.focus();
         }
@@ -51,7 +58,9 @@ function CodeInput({ onCorrectCode }) {
                             <input
                                 key={index}
                                 ref={el => inputRefs.current[index] = el}
-                                type="text"
+                                type="tel"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 value={digit}
                                 onChange={(e) => handleInputChange(index, e.target.value)}
                                 onKeyDown={(e) => handleKeyDown(index, e)}
