@@ -12,7 +12,7 @@ export const CONNECTION_GAMES = [
     },
     {
       category: "BEZ__",
-      words: ["farebný", "cenný", "úhonný", "nádejný"],
+      words: ["farebný", "mocný", "úhonný", "nádejný"],
       difficulty: 3, // Blue category
     },
     {
